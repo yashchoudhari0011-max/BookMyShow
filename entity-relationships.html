@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BookMyShow - Entity Relationships</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, sans-serif; color: #202124; background: #f5f7fb; }
+    header { padding: 28px 20px; color: white; text-align: center; background: #d71920; }
+    header h1 { margin: 0 0 8px; font-size: 28px; }
+    header p { margin: 0; opacity: .92; }
+    main { max-width: 1100px; margin: auto; padding: 30px 20px 45px; }
+    .flow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-bottom: 32px; }
+    .flow span { border-radius: 20px; padding: 8px 14px; font-weight: bold; background: white; box-shadow: 0 2px 8px #1d2b4d18; }
+    .arrow { color: #d71920; font-size: 25px; font-weight: bold; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(225px, 1fr)); gap: 18px; }
+    .entity { overflow: hidden; border: 1px solid #dce2ee; border-radius: 12px; background: white; box-shadow: 0 4px 12px #1d2b4d14; }
+    .entity h2 { margin: 0; padding: 13px 16px; color: white; font-size: 19px; background: #263859; }
+    .entity ul { margin: 0; padding: 13px 16px 14px 33px; line-height: 1.7; font-size: 14px; }
+    .key { color: #d71920; font-weight: bold; }
+    .relations { margin-top: 32px; padding: 22px; border-radius: 12px; background: white; box-shadow: 0 4px 12px #1d2b4d14; }
+    .relations h2 { margin-top: 0; }
+    .relation { padding: 12px 0; border-bottom: 1px solid #e7eaf0; line-height: 1.5; }
+    .relation:last-child { border: 0; }
+    code { padding: 2px 5px; border-radius: 4px; color: #b51016; background: #fff0f0; }
+    .note { margin-top: 24px; padding: 15px; border-left: 4px solid #d71920; background: #fff0f0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>BookMyShow Entity Relationship Map</h1>
+    <p>A visual guide to the entities in your Spring Boot project</p>
+  </header>
+
+  <main>
+    <div class="flow" aria-label="Main booking flow">
+      <span>City</span><b class="arrow">→</b><span>Theatre</span><b class="arrow">→</b><span>Screen</span><b class="arrow">→</b><span>Show</span><b class="arrow">→</b><span>Booking</span>
+    </div>
+
+    <section class="grid">
+      <article class="entity"><h2>City</h2><ul><li><span class="key">PK</span> id</li><li>name</li><li>state</li></ul></article>
+      <article class="entity"><h2>Theatre</h2><ul><li><span class="key">PK</span> id</li><li>name, address</li><li><span class="key">FK</span> city_id → City</li></ul></article>
+      <article class="entity"><h2>Screen</h2><ul><li><span class="key">PK</span> id</li><li>name, totalSeats</li><li><span class="key">FK</span> theatre_id → Theatre</li></ul></article>
+      <article class="entity"><h2>Seats</h2><ul><li><span class="key">PK</span> id</li><li>seatNumber, row, col</li><li>seatType</li><li><span class="key">FK</span> screen_id → Screen</li></ul></article>
+      <article class="entity"><h2>Movie</h2><ul><li><span class="key">PK</span> id</li><li>title, genre, language</li><li>durationMinutes, rating</li><li>releaseDate, description</li></ul></article>
+      <article class="entity"><h2>Shows</h2><ul><li><span class="key">PK</span> id</li><li><span class="key">FK</span> movie_id → Movie</li><li><span class="key">FK</span> screen_id → Screen</li><li>showDate, startTime, endTime</li><li>ticketPrice</li></ul></article>
+      <article class="entity"><h2>User</h2><ul><li><span class="key">PK</span> id</li><li>name, email, password</li><li>phonenumber, createdAt</li></ul></article>
+      <article class="entity"><h2>Booking</h2><ul><li><span class="key">PK</span> id</li><li><span class="key">FK</span> user_id → User</li><li><span class="key">FK</span> show_id → Shows</li><li>totalPrice, status, bookedAt</li></ul></article>
+    </section>
+
+    <section class="relations">
+      <h2>How to read the relationships</h2>
+      <div class="relation"><strong>City 1 → many Theatres:</strong> one city can contain many theatres. Each theatre belongs to one city through <code>city_id</code>.</div>
+      <div class="relation"><strong>Theatre 1 → many Screens:</strong> a theatre can have multiple screens/auditoriums. Each screen belongs to one theatre through <code>theatre_id</code>.</div>
+      <div class="relation"><strong>Screen 1 → many Seats:</strong> every screen has many physical seats. Each seat belongs to one screen through <code>screen_id</code>.</div>
+      <div class="relation"><strong>Movie 1 → many Shows:</strong> one movie can be scheduled multiple times, so each show refers to one movie through <code>movie_id</code>.</div>
+      <div class="relation"><strong>Screen 1 → many Shows:</strong> a screen can host many shows at different times. Each show uses one screen through <code>screen_id</code>.</div>
+      <div class="relation"><strong>User 1 → many Bookings:</strong> a user can make many bookings. Each booking belongs to one user through <code>user_id</code>.</div>
+      <div class="relation"><strong>Show 1 → many Bookings:</strong> many users may book tickets for the same show. Each booking refers to one show through <code>show_id</code>.</div>
+      <div class="relation"><strong>Booking many ↔ many Seats:</strong> one booking may include several seats, and seats are connected through the join table <code>booking_seats</code> (<code>booking_id</code>, <code>seat_id</code>).</div>
+    </section>
+    <p class="note"><strong>Interview explanation:</strong> “A movie is scheduled as a show on a particular screen. A user creates a booking for that show and selects one or more seats. The booking stores the final price, status, and booking time.”</p>
+  </main>
+</body>
+</html>
